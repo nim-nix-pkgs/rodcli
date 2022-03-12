@@ -1,0 +1,26 @@
+{
+  description = ''making Nim development easier in the command-line'';
+
+  inputs.flakeNimbleLib.owner = "riinr";
+  inputs.flakeNimbleLib.ref   = "master";
+  inputs.flakeNimbleLib.repo  = "nim-flakes-lib";
+  inputs.flakeNimbleLib.type  = "github";
+  inputs.flakeNimbleLib.inputs.nixpkgs.follows = "nixpkgs";
+  
+  inputs.src-rodcli-master.flake = false;
+  inputs.src-rodcli-master.owner = "jabbalaci";
+  inputs.src-rodcli-master.ref   = "refs/heads/master";
+  inputs.src-rodcli-master.repo  = "NimCliHelper";
+  inputs.src-rodcli-master.type  = "github";
+  
+  outputs = { self, nixpkgs, flakeNimbleLib, ...}@deps:
+  let 
+    lib  = flakeNimbleLib.lib;
+    args = ["self" "nixpkgs" "flakeNimbleLib" "src-rodcli-master"];
+  in lib.mkRefOutput {
+    inherit self nixpkgs ;
+    src  = deps."src-rodcli-master";
+    deps = builtins.removeAttrs deps args;
+    meta = builtins.fromJSON (builtins.readFile ./meta.json);
+  };
+}
